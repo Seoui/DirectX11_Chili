@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1209
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hw3d", "hw3d\hw3d.vcxproj", "{8764E6DF-6C13-42FD-BF43-F17D93F97EEF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8764E6DF-6C13-42FD-BF43-F17D93F97EEF}.Debug|x64.ActiveCfg = Debug|x64
+		{8764E6DF-6C13-42FD-BF43-F17D93F97EEF}.Debug|x64.Build.0 = Debug|x64
+		{8764E6DF-6C13-42FD-BF43-F17D93F97EEF}.Release|x64.ActiveCfg = Release|x64
+		{8764E6DF-6C13-42FD-BF43-F17D93F97EEF}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A24ED586-0C30-471A-AB6C-649418BA099D}
+	EndGlobalSection
+EndGlobal
