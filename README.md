@@ -1,7 +1,7 @@
 # DirectX 11 프레임워크
 
-### ChiliTomatoNoodle의 DirectX 11 프레임워크입니다.
-### https://www.youtube.com/c/ChiliTomatoNoodle
+#### ChiliTomatoNoodle의 DirectX 11 프레임워크입니다.
+#### https://www.youtube.com/c/ChiliTomatoNoodle
 ***
 
 Frank Luna의 책 Introduction to 3D Game Programming with DirectX 11의 모든 연습문제를
