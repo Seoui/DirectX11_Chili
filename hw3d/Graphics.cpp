@@ -1,11 +1,11 @@
 #include "Graphics.h"
 #include "dxerr.h"
-#include <sstream>
-#include <d3dcompiler.h>
-#include <DirectXMath.h>
 #include "GraphicsThrowMacros.h"
 #include "Imgui/imgui_impl_dx11.h"
 #include "Imgui/imgui_impl_win32.h"
+#include <sstream>
+#include <d3dcompiler.h>
+#include <DirectXMath.h>
 
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;

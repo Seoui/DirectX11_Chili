@@ -6,6 +6,8 @@
 class Sphere
 {
 public:
+	// latitude: 위도 ⌒ ∪ 
+	// longitude: 경도 ( )
 	template<class V>
 	static IndexedTriangleList<V> MakeTesselated(int latDiv, int longDiv)
 	{

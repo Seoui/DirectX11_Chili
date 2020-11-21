@@ -5,6 +5,8 @@
 #include "Imgui/imgui_impl_win32.h"
 
 // Window Class Stuff
+// Window 클래스에서 가장 먼저 초기화 된다 
+// WindowClass 클래스가(싱글톤 패턴의)
 Window::WindowClass Window::WindowClass::wndClass;
 
 Window::WindowClass::WindowClass() noexcept
@@ -56,6 +58,7 @@ Window::Window(int width, int height, const char* name)
 	height(height)
 {
 	// calculate window size based on desired client region size
+	// RECT은 프로그램 창이 윈도우 화면에 표시될 위치를 결정한다.
 	RECT wr;
 	wr.left = 100;
 	wr.right = width + wr.left;
@@ -157,6 +160,7 @@ LRESULT CALLBACK Window::HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPAR
 	return pWnd->HandleMsg(hWnd, msg, wParam, lParam);
 }
 
+// lParam은 포인터값, wParam은 핸들 또는 정수값
 LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))

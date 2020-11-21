@@ -13,7 +13,7 @@ TransformCbuf::TransformCbuf(Graphics& gfx, const Drawable& parent, UINT slot)
 void TransformCbuf::Bind(Graphics& gfx) noexcept
 {
 	// 여기서 parent.GetTransformXM() 함수는 오브젝트의 완전히 계산이 끝난
-	// world 기준으로 변환하는 변환 매트릭스를 반환한다.
+	// world space로 변환하는 변환 매트릭스를 반환한다.
 	// 카메라까지 곱하면 view matrix 완성
 	const auto modelView = parent.GetTransformXM() * gfx.GetCamera();
 	// 상수버퍼고 셰이더에 보내야 하므로 transpose 하고 있다.

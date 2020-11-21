@@ -11,9 +11,10 @@ public:
 	{
 		namespace dx = DirectX;
 
-		constexpr float side = 1.0f / 2.0f;
+		constexpr float side = 1.0f / 2.0f;	// 0.5f
 
 		std::vector<V> vertices(8);
+		// local 좌표 기준 pos
 		vertices[0].pos = { -side, -side, -side}; // 0
 		vertices[1].pos = { side, -side, -side }; // 1
 		vertices[2].pos = { -side, side, -side }; // 2
@@ -25,7 +26,7 @@ public:
 
 		// 여기서 IndexedTriangleList의 생성자가 호출됨
 		return{
-			std::move(vertices),{
+			std::move(vertices), {
 				0,2,1, 2,3,1,
 				1,3,5, 3,7,5,
 				2,6,3, 3,6,7,
@@ -35,6 +36,7 @@ public:
 			}
 		};
 	}
+
 	template<class V>
 	static IndexedTriangleList<V> MakeSkinned()
 	{
@@ -128,5 +130,38 @@ public:
 			20,23,21,	20,22,23
 			}
 		};
+	}
+
+	template<class V>
+	static IndexedTriangleList<V> MakeIndependentTextured()
+	{
+		auto itl = MakeIndependent<V>();
+
+		itl.vertices[0].tc = { 0.0f,0.0f };
+		itl.vertices[1].tc = { 1.0f,0.0f };
+		itl.vertices[2].tc = { 0.0f,1.0f };
+		itl.vertices[3].tc = { 1.0f,1.0f };
+		itl.vertices[4].tc = { 0.0f,0.0f };
+		itl.vertices[5].tc = { 1.0f,0.0f };
+		itl.vertices[6].tc = { 0.0f,1.0f };
+		itl.vertices[7].tc = { 1.0f,1.0f };
+		itl.vertices[8].tc = { 0.0f,0.0f };
+		itl.vertices[9].tc = { 1.0f,0.0f };
+		itl.vertices[10].tc = { 0.0f,1.0f };
+		itl.vertices[11].tc = { 1.0f,1.0f };
+		itl.vertices[12].tc = { 0.0f,0.0f };
+		itl.vertices[13].tc = { 1.0f,0.0f };
+		itl.vertices[14].tc = { 0.0f,1.0f };
+		itl.vertices[15].tc = { 1.0f,1.0f };
+		itl.vertices[16].tc = { 0.0f,0.0f };
+		itl.vertices[17].tc = { 1.0f,0.0f };
+		itl.vertices[18].tc = { 0.0f,1.0f };
+		itl.vertices[19].tc = { 1.0f,1.0f };
+		itl.vertices[20].tc = { 0.0f,0.0f };
+		itl.vertices[21].tc = { 1.0f,0.0f };
+		itl.vertices[22].tc = { 0.0f,1.0f };
+		itl.vertices[23].tc = { 1.0f,1.0f };
+
+		return itl;
 	}
 };

@@ -14,6 +14,7 @@ SolidSphere::SolidSphere(Graphics & gfx, float radius)
 			dx::XMFLOAT3 pos;
 		};
 		auto model = Sphere::Make<Vertex>();
+		// 정점의 스케일(반지름 만큼) 변환
 		model.Transform(dx::XMMatrixScaling(radius, radius, radius));
 		AddBind(std::make_unique<VertexBuffer>(gfx, model.vertices));
 		AddIndexBuffer(std::make_unique<IndexBuffer>(gfx, model.indices));
@@ -26,6 +27,7 @@ SolidSphere::SolidSphere(Graphics & gfx, float radius)
 
 		struct PSColorConstant
 		{
+			// 구인데 고체구를 표현하기 위해 하얀색
 			dx::XMFLOAT3 color = { 1.0f, 1.0f, 1.0f };
 			float padding;
 		} colorConst;
@@ -43,7 +45,7 @@ SolidSphere::SolidSphere(Graphics & gfx, float radius)
 	{
 		SetIndexFromStatic();
 	}
-
+	// VertexConstant 버퍼
 	AddBind(std::make_unique<TransformCbuf>(gfx, *this));
 }
 

@@ -1,10 +1,10 @@
 #pragma once
 #include "ChiliWin.h"
 #include "ChiliException.h"
+#include "DxgiInfoManager.h"
 #include <d3d11.h>
 #include <wrl.h>
 #include <vector>
-#include "DxgiInfoManager.h"
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include <memory>
@@ -50,6 +50,7 @@ public:
 	private:
 		std::string reason;
 	};
+
 public:
 	Graphics(HWND hWnd);
 	Graphics(const Graphics&) = delete;

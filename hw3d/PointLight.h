@@ -42,9 +42,9 @@ private:
 		alignas(16) DirectX::XMFLOAT3 ambient;
 		alignas(16) DirectX::XMFLOAT3 diffuseColor;
 		float diffuseIntensity;
-		float attConst;
-		float attLin;
-		float attQuad;
+		float attConst;	// 상수 계수
+		float attLin;	// 1차 계수
+		float attQuad;	// 2차 계수
 	};
 private:
 	PointLightCBuf cbData;

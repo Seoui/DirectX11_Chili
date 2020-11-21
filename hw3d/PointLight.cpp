@@ -6,6 +6,9 @@ PointLight::PointLight(Graphics & gfx, float radius)
 	mesh(gfx, radius),
 	cbuf(gfx)
 {
+	/*
+		SolidSphere mesh는 하나의 하얀색 구임, 반지름의 길이는 default 0.5f
+	*/
 	Reset();
 }
 
@@ -61,5 +64,6 @@ void PointLight::Bind(Graphics & gfx, DirectX::FXMMATRIX view) const noexcept
 	const auto pos = DirectX::XMLoadFloat3(&cbData.pos);
 	DirectX::XMStoreFloat3(&dataCopy.pos, DirectX::XMVector3Transform(pos, view));
 	cbuf.Update(gfx, dataCopy);
+	// 픽셀 셰이더에 바인드
 	cbuf.Bind(gfx);
 }

@@ -2,6 +2,7 @@
 #include "BindableBase.h"
 #include "GraphicsThrowMacros.h"
 #include "Cube.h"
+#include "Imgui/imgui.h" 
 
 
 Box::Box(Graphics& gfx,
@@ -60,20 +61,9 @@ Box::Box(Graphics& gfx,
 	// VS에 Bind한다. local-> World 변환은 Box 클래스에서 해주고 있음
 	AddBind(std::make_unique<TransformCbuf>(gfx, *this));
 
-	// PS에 bind하기 위한 material 상수 버퍼
-	struct PSMaterialConstant
-	{
-		// alinged16이 되어야 하므로 padding[3]이다.
-		// specular light는 shininess을 결정한다
-		dx::XMFLOAT3 color;
-		float specularIntensity = 0.6f;
-		float specularPower = 30.0f;
-		float padding[3];
-	} colorConst;
-	// material은 XMFLOAT3타입이고 [0, 1] 실수범위의 랜덤색상임
-	colorConst.color = material;
-	// PSMaterialConstant 자료형으로 buffer를 만들고 PS에 bind 하고 있다
-	AddBind(std::make_unique<PixelConstantBuffer<PSMaterialConstant>>(gfx, colorConst, 1u));
+	materialConstants.color = material;
+	AddBind(std::make_unique<MaterialCbuf>(gfx, materialConstants, 1u));
+
 	// model deformation transform (per instance, not stored as bind)
 	// Box 생성자에서 box의 월드 스케일을 설정한다.
 	// z축 기준 스케일은 랜덤이고요
@@ -86,6 +76,46 @@ Box::Box(Graphics& gfx,
 DirectX::XMMATRIX Box::GetTransformXM() const noexcept
 {
 	namespace dx = DirectX;
-	// box의 world 좌표(스케일만 적용된) * box의 world좌표(RT + world좌표 기준 회전) 
+	// box의 로컬 좌표 기준으로 * S(스케일만 적용된) * box를 world좌표로 변환(RT + world좌표 기준 회전) 
 	return dx::XMLoadFloat3x3(&mt) * TestObject::GetTransformXM();
+}
+
+bool Box::SpawnControlWindow(int id, Graphics & gfx) noexcept
+{
+	using namespace std::string_literals;
+
+	bool dirty = false;
+	bool open = true;
+	if (ImGui::Begin(("Box "s + std::to_string(id)).c_str(), &open))
+	{
+		ImGui::Text("Material Properties");
+		const auto cd = ImGui::ColorEdit3("Material Color", &materialConstants.color.x);
+		const auto sid = ImGui::SliderFloat("Specular Intensity", &materialConstants.specularIntensity, 0.05, 4.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+		const auto spd = ImGui::SliderFloat("Specular Power", &materialConstants.specularPower, 1.0f, 200.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+		dirty = cd || sid || spd;
+
+		ImGui::Text("Position");
+		ImGui::SliderFloat("R", &r, 0.0f, 80.0f, "%.1f");
+		ImGui::SliderAngle("Theta", &theta, -180.0f, 180.0f);
+		ImGui::SliderAngle("Phi", &phi, -180.0f, 180.0f);
+		ImGui::Text("Orientation");
+		ImGui::SliderAngle("Roll", &roll, -180.0f, 180.0f);
+		ImGui::SliderAngle("Pitch", &pitch, -180.0f, 180.0f);
+		ImGui::SliderAngle("Yaw", &yaw, -180.0f, 180.0f);
+	}	
+	ImGui::End();
+
+	if (dirty)
+	{
+		SyncMaterial(gfx);
+	}
+
+	return open;
+}
+
+void Box::SyncMaterial(Graphics & gfx) noexcept(!IS_DEBUG)
+{
+	auto pConstPS = QueryBindable<MaterialCbuf>();
+	assert(pConstPS != nullptr);
+	pConstPS->Update(gfx, materialConstants);
 }

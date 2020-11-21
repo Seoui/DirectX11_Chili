@@ -2,6 +2,8 @@
 #include "Box.h"
 #include "Cylinder.h"
 #include "Pyramid.h"
+#include "Exercise/Hill.h"
+#include "SkinnedBox.h"
 #include <memory>
 #include <algorithm>
 #include "ChiliMath.h"
@@ -21,7 +23,7 @@ App::App()
 	:
 	// 1280 : 720  = 16 : 9
 	wnd(1280, 720, "The Donkey Fart Box"),
-	light(wnd.Gfx())
+	light(wnd.Gfx()), hill(wnd.Gfx())
 {
 	class Factory
 	{
@@ -32,9 +34,10 @@ App::App()
 		{}
 		std::unique_ptr<Drawable> operator()()
 		{
+			// material color
 			const DirectX::XMFLOAT3 mat = { cdist(rng), cdist(rng), cdist(rng) };
 
-			switch (sdist(rng))
+			switch (0)
 			{
 			case 0:
 				return std::make_unique<Box>(
@@ -46,6 +49,16 @@ App::App()
 					gfx, rng, adist, ddist, odist,
 					rdist, bdist, tdist
 					);
+			case 2:
+				return std::make_unique<Pyramid>(
+					gfx, rng, adist, ddist, odist,
+					rdist, tdist
+					);
+			case 3:
+				return std::make_unique<SkinnedBox>(
+					gfx, rng, adist, ddist,
+					odist, rdist
+					);
 			default:
 				assert(false && "impossible drawable option in factory");
 				return {};
@@ -54,7 +67,7 @@ App::App()
 	private:
 		Graphics& gfx;
 		std::mt19937 rng{ std::random_device{}() };
-		std::uniform_int_distribution<int> sdist{ 0, 1 };
+		std::uniform_int_distribution<int> sdist{ 0, 3 };
 		std::uniform_real_distribution<float> adist{ 0.0f,PI * 2.0f };
 		std::uniform_real_distribution<float> ddist{ 0.0f,PI * 0.5f };
 		std::uniform_real_distribution<float> odist{ 0.0f,PI * 0.08f };
@@ -66,17 +79,30 @@ App::App()
 
 	drawables.reserve(nDrawables);
 	std::generate_n(std::back_inserter(drawables), nDrawables, Factory{ wnd.Gfx() });
+
+	// init box pointers for editing instance parameters
+	for (auto& pd : drawables)
+	{
+		if (auto pb = dynamic_cast<Box*>(pd.get()))
+		{
+			boxes.push_back(pb);
+		}
+	}
 	// XMMatrixPerspectiveLH(수직시야각, 종횡비, 가까운 평면까지 거리, 먼 평면까지 거리);
 	// 주의! 아래 두 줄의 코드는 Graphics 클래스에서 하나의 Matrix인 변수에다가 Setting 해준 것일 뿐이다.
 	// 실제 카메라는 cam 클래스 변수이다.
 	// 프로젝션은 안변한다, 생성자에 한번 설정하고 계속 간다.
 	wnd.Gfx().SetProjection(dx::XMMatrixPerspectiveLH(1.0f, 9.0f / 16.0f, 0.5f, 40.0f));
-	wnd.Gfx().SetCamera(dx::XMMatrixTranslation(0.0f, 0.0f, 20.0f));
 }
 
 void App::DoFrame()
 {
 	const auto dt = timer.Mark() * speed_factor;
+	/*
+		BeginFrame은 그려질 준비를 한다. 
+		주어진 색상으로
+		RenderTargetView와 DepthStencilView를 Clear 한다
+	*/
 	wnd.Gfx().BeginFrame(0.07f, 0.0f, 0.12f);
 	/* 
 		여기서 비로소 cam의 view matrix(rotation matrix를 곱한)를 셋팅한다.
@@ -87,7 +113,8 @@ void App::DoFrame()
 	*/
 	wnd.Gfx().SetCamera(cam.GetMatrix());
 	light.Bind(wnd.Gfx(), cam.GetMatrix());
-
+	
+	// render geometry
 	for (auto& d : drawables)
 	{
 		d->Update(wnd.kbd.KeyIsPressed(VK_SPACE) ? 0.0f : dt);
@@ -95,6 +122,20 @@ void App::DoFrame()
 	}
 	light.Draw(wnd.Gfx());
 	
+	// imgui windows
+	SpawnSimulationWindow();
+	cam.SpawnControlWindow();
+	light.SpawnControlWindow();
+	SpawnBoxWindowManagerWindow();
+	SpawnBoxWindows();
+
+	// present
+	// 실제로 화면에 표현
+	wnd.Gfx().EndFrame();
+}
+
+void App::SpawnSimulationWindow() noexcept
+{
 	// imgui window to control simulation speed
 	if (ImGui::Begin("Simulation Speed"))
 	{
@@ -103,12 +144,53 @@ void App::DoFrame()
 		ImGui::Text("Status: %s", wnd.kbd.KeyIsPressed(VK_SPACE) ? "PAUSED" : "RUNNING (hold spacebar to pause");
 	}
 	ImGui::End();
-	// imgui windows to control camera and light
-	cam.SpawnControlWindow();
-	light.SpawnControlWindow();
+}
 
-	// present
-	wnd.Gfx().EndFrame();
+void App::SpawnBoxWindowManagerWindow() noexcept
+{
+	// imgui window to open box windows
+	if (ImGui::Begin("Boxes"))
+	{
+		using namespace std::string_literals;
+		const auto preview = comboBoxIndex ? std::to_string(*comboBoxIndex) : "Choose a box..."s;
+		if (ImGui::BeginCombo("Box Number", preview.c_str()))
+		{
+			for (int i = 0; i < boxes.size(); i++)
+			{
+				const bool selected = *comboBoxIndex = i;
+				if (ImGui::Selectable(std::to_string(i).c_str(), selected))
+				{
+					comboBoxIndex = i;
+				}
+				if (selected)
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+		if (ImGui::Button("Spawn Control Window") && comboBoxIndex)
+		{
+			boxControlIds.insert(*comboBoxIndex);
+			comboBoxIndex.reset();
+		}
+	}
+	ImGui::End();
+}
+
+void App::SpawnBoxWindows() noexcept
+{
+	for (auto i = boxControlIds.begin(); i != boxControlIds.end();)
+	{
+		if (!boxes[*i]->SpawnControlWindow(*i, wnd.Gfx()))
+		{
+			i = boxControlIds.erase(i);
+		}
+		else
+		{
+			i++;
+		}
+	}
 }
 
 App::~App()

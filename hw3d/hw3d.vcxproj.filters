@@ -153,13 +153,19 @@
     <ClCompile Include="PointLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SolidSphere.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Cylinder.cpp">
       <Filter>Source Files\Drawable</Filter>
     </ClCompile>
-    <ClCompile Include="Chapter1.cpp">
+    <ClCompile Include="SolidSphere.cpp">
+      <Filter>Source Files\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Exercise\Hill.cpp">
+      <Filter>Exercise</Filter>
+    </ClCompile>
+    <ClCompile Include="Exercise\Chapter1.cpp">
+      <Filter>Exercise</Filter>
+    </ClCompile>
+    <ClCompile Include="Exercise\BoxEx.cpp">
       <Filter>Exercise</Filter>
     </ClCompile>
   </ItemGroup>
@@ -317,16 +323,25 @@
     <ClInclude Include="PointLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SolidSphere.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TestObject.h">
       <Filter>Header Files\Drawable</Filter>
     </ClInclude>
     <ClInclude Include="Cylinder.h">
       <Filter>Header Files\Drawable</Filter>
     </ClInclude>
-    <ClInclude Include="Chapter1.h">
+    <ClInclude Include="SolidSphere.h">
+      <Filter>Header Files\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Exercise\Grid.h">
+      <Filter>Exercise</Filter>
+    </ClInclude>
+    <ClInclude Include="Exercise\Hill.h">
+      <Filter>Exercise</Filter>
+    </ClInclude>
+    <ClInclude Include="Exercise\Chapter1.h">
+      <Filter>Exercise</Filter>
+    </ClInclude>
+    <ClInclude Include="Exercise\BoxEx.h">
       <Filter>Exercise</Filter>
     </ClInclude>
   </ItemGroup>
@@ -377,6 +392,18 @@
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="IndexedPhongPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="BlendedPhongPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="BlendedPhongVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="TexturedPhongPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="TexturedPhongVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>

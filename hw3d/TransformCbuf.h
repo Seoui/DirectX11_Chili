@@ -9,7 +9,9 @@ class TransformCbuf : public Bindable
 private:
 	struct Transforms
 	{
+		// homogeneous clip space(동차절단공간) 또는 projection space(투영공간) 변환 행렬
 		DirectX::XMMATRIX modelViewProj;
+		// local space
 		DirectX::XMMATRIX model;
 	};
 public:
