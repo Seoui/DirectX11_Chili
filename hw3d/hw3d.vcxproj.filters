@@ -168,6 +168,9 @@
     <ClCompile Include="Exercise\BoxEx.cpp">
       <Filter>Exercise</Filter>
     </ClCompile>
+    <ClCompile Include="AssTest.cpp">
+      <Filter>Source Files\Drawable</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowsMessageMap.h">
@@ -343,6 +346,9 @@
     </ClInclude>
     <ClInclude Include="Exercise\BoxEx.h">
       <Filter>Exercise</Filter>
+    </ClInclude>
+    <ClInclude Include="AssTest.h">
+      <Filter>Header Files\Drawable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

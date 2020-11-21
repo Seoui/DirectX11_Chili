@@ -4,7 +4,6 @@
 #include "ImguiManager.h"
 #include "Camera.h"
 #include "PointLight.h"
-#include "Hill.h"
 #include <set>
 
 class App
@@ -25,7 +24,6 @@ private:
 	ChiliTimer timer;
 	Camera cam;
 	PointLight light;
-	Hill hill;
 	std::vector<std::unique_ptr<class Drawable>> drawables;
 	std::vector<class Box*> boxes;
 	float speed_factor = 1.0f;
