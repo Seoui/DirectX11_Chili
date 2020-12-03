@@ -27,7 +27,7 @@ private:
 	std::vector<std::unique_ptr<class Drawable>> drawables;
 	std::vector<class Box*> boxes;
 	float speed_factor = 1.0f;
-	static constexpr size_t nDrawables = 1;
+	static constexpr size_t nDrawables = 10;
 	std::optional<int> comboBoxIndex;
 	std::set<int> boxControlIds;
 };

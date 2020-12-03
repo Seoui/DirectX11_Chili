@@ -4,6 +4,7 @@
 #include "Pyramid.h"
 #include "Exercise/Hill.h"
 #include "SkinnedBox.h"
+#include "AssTest.h"
 #include <memory>
 #include <algorithm>
 #include "ChiliMath.h"
@@ -16,7 +17,6 @@
 
 namespace dx = DirectX;
 GDIPlusManager gdipm;
-
 /*
 	r		: 거리
 	theta	: 수평시야각
@@ -28,12 +28,6 @@ App::App()
 	wnd(1280, 720, "The Donkey Fart Box"),
 	light(wnd.Gfx())
 {
-	Assimp::Importer imp;
-	auto model = imp.ReadFile("Models\\suzanne.obj",
-		aiProcess_Triangulate | 
-		aiProcess_JoinIdenticalVertices
-	);
-
 	class Factory
 	{
 	public:
@@ -46,7 +40,7 @@ App::App()
 			// material color
 			const DirectX::XMFLOAT3 mat = { cdist(rng), cdist(rng), cdist(rng) };
 
-			switch (0)
+			switch (sdist(rng))
 			{
 			case 0:
 				return std::make_unique<Box>(
@@ -68,6 +62,11 @@ App::App()
 					gfx, rng, adist, ddist,
 					odist, rdist
 					);
+			case 4:
+				return std::make_unique<AssTest>(
+					gfx, rng, adist, ddist,
+					odist, rdist, mat, 1.5f
+					);
 			default:
 				assert(false && "impossible drawable option in factory");
 				return {};
@@ -76,7 +75,7 @@ App::App()
 	private:
 		Graphics& gfx;
 		std::mt19937 rng{ std::random_device{}() };
-		std::uniform_int_distribution<int> sdist{ 0, 3 };
+		std::uniform_int_distribution<int> sdist{ 0, 4 };
 		std::uniform_real_distribution<float> adist{ 0.0f,PI * 2.0f };
 		std::uniform_real_distribution<float> ddist{ 0.0f,PI * 0.5f };
 		std::uniform_real_distribution<float> odist{ 0.0f,PI * 0.08f };
