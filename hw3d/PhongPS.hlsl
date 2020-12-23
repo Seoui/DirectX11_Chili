@@ -3,7 +3,7 @@
 // 그것에 맞춰서 셰이더 파일에 적용되는 듯 하다
 // PointLight에 정의된 PointLightCBuf 구조체는 아래 LightCBuf 구조체와 구조가 같다
 // 하지만 PointLight의 mesh인 SolidSphere는 SolidPS에 바인드 되어있다
-// 그럼에도 이 셰이더 파일과 통신하고 있다는 것......음..
+// 그럼에도 이 셰이더 파일과 통신하고 있다는 것....음..
 cbuffer LightCBuf
 {
     float3 lightPos;
@@ -17,12 +17,16 @@ cbuffer LightCBuf
 
 cbuffer ObjectCBuf
 {
-    float3 materialColor;
     float specularIntensity;
     float specularPower;
+    float padding[2];
 };
 
-float4 main(float3 worldPos : Position, float3 n : Normal) : SV_Target
+Texture2D tex;
+
+SamplerState splr;
+
+float4 main(float3 worldPos : Position, float3 n : Normal, float2 tc : Texcoord) : SV_Target
 {
 	// fragment to light vector data
     // 빛 벡터(빛 벡터는 빛을 향한다)
@@ -42,8 +46,8 @@ float4 main(float3 worldPos : Position, float3 n : Normal) : SV_Target
     const float3 r = w * 2.0f - vToL;
     // calculate specular intensity based on angle between viewing vector and reflection vector, narrow with power function
     // worldPos는 오브젝트의 위치다. ambient light는 반영되어있지 않다. 
-    // 왜 diffuse color와 difuuseIntensity를 중복해서 더하는 걸까..?
+    // 왜 diffuse color와 diffuseIntensity를 중복해서 더하는 걸까..?
     const float3 specular = att * (diffuseColor * diffuseIntensity) * specularIntensity * pow(max(0.0f, dot(normalize(-r), normalize(worldPos))), specularPower);
     // final color
-    return float4(saturate((diffuse + ambient + specular) * materialColor), 1.0f);
+    return float4(saturate((diffuse + ambient) * tex.Sample(splr, tc).rgb + specular), 1.0f);
 }

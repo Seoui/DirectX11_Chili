@@ -13,12 +13,12 @@ namespace dx = DirectX;
 #pragma comment(lib,"d3d11.lib")
 #pragma comment(lib,"D3DCompiler.lib")
 
-Graphics::Graphics(HWND hWnd)
+Graphics::Graphics(HWND hWnd, int width, int height)
 {
 	// SwapChain을 만들기전에 Description 먼저 작성한다.
 	DXGI_SWAP_CHAIN_DESC sd = {};
-	sd.BufferDesc.Width = 0;	// 해상도(화질, 선명함의 정도)의 너비
-	sd.BufferDesc.Height = 0;	// 해상도(화질, 선명함의 정도)의 높이
+	sd.BufferDesc.Width = width;	// 해상도(화질, 선명함의 정도)의 너비
+	sd.BufferDesc.Height = height;	// 해상도(화질, 선명함의 정도)의 높이
 	sd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;	// 대부분 이 포맷을 사용
 	sd.BufferDesc.RefreshRate.Numerator = 0;	// 주사율, 분자
 	sd.BufferDesc.RefreshRate.Denominator = 0;	// 주사율, 분모
@@ -89,8 +89,8 @@ Graphics::Graphics(HWND hWnd)
 	// create depth stensil texture
 	wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
 	D3D11_TEXTURE2D_DESC descDepth = {};
-	descDepth.Width = 1280u;
-	descDepth.Height = 720u;
+	descDepth.Width = width;
+	descDepth.Height = height;
 	descDepth.MipLevels = 1u;
 	descDepth.ArraySize = 1u;
 	descDepth.Format = DXGI_FORMAT_D32_FLOAT;
@@ -114,8 +114,8 @@ Graphics::Graphics(HWND hWnd)
 
 	// configure viewport
 	D3D11_VIEWPORT vp;
-	vp.Width = 1280.0f;
-	vp.Height = 720.0f;
+	vp.Width = (float)width;
+	vp.Height = (float)height;
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
 	vp.TopLeftX = 0.0f;
@@ -178,7 +178,7 @@ void Graphics::BeginFrame(float red, float green, float blue) noexcept
 	pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 
-void Graphics::DrawIndexed(UINT count) noexcept(!IS_DEBUG)
+void Graphics::DrawIndexed(UINT count) noxnd
 {
 	GFX_THROW_INFO_ONLY(pContext->DrawIndexed(count, 0u, 0u));
 }

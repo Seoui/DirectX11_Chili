@@ -4,6 +4,9 @@
 #include "ImguiManager.h"
 #include "Camera.h"
 #include "PointLight.h"
+#include "TestPlane.h"
+#include "TestCube.h"
+#include "Mesh.h"
 #include <set>
 
 class App
@@ -15,19 +18,17 @@ public:
 	~App();
 private:
 	void DoFrame();
-	void SpawnSimulationWindow() noexcept;
-	void SpawnBoxWindowManagerWindow() noexcept;
-	void SpawnBoxWindows() noexcept;
+	void ShowImguiDemoWindow();
 private:
+	bool showDemoWindow = false;
 	ImguiManager imgui;
 	Window wnd;
 	ChiliTimer timer;
+	float speed_factor = 1.0f;
 	Camera cam;
 	PointLight light;
-	std::vector<std::unique_ptr<class Drawable>> drawables;
-	std::vector<class Box*> boxes;
-	float speed_factor = 1.0f;
-	static constexpr size_t nDrawables = 10;
-	std::optional<int> comboBoxIndex;
-	std::set<int> boxControlIds;
+	Model nano{ wnd.Gfx(), "Models\\nano_textured\\nanosuit.obj" };
+	//Model nano2{ wnd.Gfx(), "Models\\nano_textured\\nanosuit.obj" };
+	TestPlane plane;
+	TestCube cube;
 };

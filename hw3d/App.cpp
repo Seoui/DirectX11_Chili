@@ -1,19 +1,11 @@
 #include "App.h"
-#include "Box.h"
-#include "Cylinder.h"
-#include "Pyramid.h"
-#include "Exercise/Hill.h"
-#include "SkinnedBox.h"
-#include "AssTest.h"
 #include <memory>
 #include <algorithm>
 #include "ChiliMath.h"
 #include "Surface.h"
 #include "GDIPlusManager.h"
-#include "Imgui/imgui.h"
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+#include "imgui/imgui.h"
+#include "VertexBuffer.h"
 
 namespace dx = DirectX;
 GDIPlusManager gdipm;
@@ -26,76 +18,12 @@ App::App()
 	:
 	// 1280 : 720  = 16 : 9
 	wnd(1280, 720, "The Donkey Fart Box"),
-	light(wnd.Gfx())
+	light(wnd.Gfx()),
+	plane(wnd.Gfx(), 3.0f),
+	cube(wnd.Gfx(), 4.0f)
 {
-	class Factory
-	{
-	public:
-		Factory(Graphics& gfx)
-			:
-			gfx(gfx)
-		{}
-		std::unique_ptr<Drawable> operator()()
-		{
-			// material color
-			const DirectX::XMFLOAT3 mat = { cdist(rng), cdist(rng), cdist(rng) };
-
-			switch (sdist(rng))
-			{
-			case 0:
-				return std::make_unique<Box>(
-					gfx, rng, adist, ddist,
-					odist, rdist, bdist, mat
-					);
-			case 1:
-				return std::make_unique<Cylinder>(
-					gfx, rng, adist, ddist, odist,
-					rdist, bdist, tdist
-					);
-			case 2:
-				return std::make_unique<Pyramid>(
-					gfx, rng, adist, ddist, odist,
-					rdist, tdist
-					);
-			case 3:
-				return std::make_unique<SkinnedBox>(
-					gfx, rng, adist, ddist,
-					odist, rdist
-					);
-			case 4:
-				return std::make_unique<AssTest>(
-					gfx, rng, adist, ddist,
-					odist, rdist, mat, 1.5f
-					);
-			default:
-				assert(false && "impossible drawable option in factory");
-				return {};
-			}
-		}
-	private:
-		Graphics& gfx;
-		std::mt19937 rng{ std::random_device{}() };
-		std::uniform_int_distribution<int> sdist{ 0, 4 };
-		std::uniform_real_distribution<float> adist{ 0.0f,PI * 2.0f };
-		std::uniform_real_distribution<float> ddist{ 0.0f,PI * 0.5f };
-		std::uniform_real_distribution<float> odist{ 0.0f,PI * 0.08f };
-		std::uniform_real_distribution<float> rdist{ 6.0f,20.0f };
-		std::uniform_real_distribution<float> bdist{ 0.4f,3.0f };
-		std::uniform_real_distribution<float> cdist{ 0.0f, 1.0f };
-		std::uniform_int_distribution<int> tdist{ 3, 30 };
-	};
-
-	drawables.reserve(nDrawables);
-	std::generate_n(std::back_inserter(drawables), nDrawables, Factory{ wnd.Gfx() });
-
-	// init box pointers for editing instance parameters
-	for (auto& pd : drawables)
-	{
-		if (auto pb = dynamic_cast<Box*>(pd.get()))
-		{
-			boxes.push_back(pb);
-		}
-	}
+	plane.SetPos({ 1.0f, 17.0f, -1.0f });
+	cube.SetPos({ 3.0f, 14.0f, -2.0f });
 	// XMMatrixPerspectiveLH(수직시야각, 종횡비, 가까운 평면까지 거리, 먼 평면까지 거리);
 	// 주의! 아래 두 줄의 코드는 Graphics 클래스에서 하나의 Matrix인 변수에다가 Setting 해준 것일 뿐이다.
 	// 실제 카메라는 cam 클래스 변수이다.
@@ -121,89 +49,100 @@ void App::DoFrame()
 	*/
 	wnd.Gfx().SetCamera(cam.GetMatrix());
 	light.Bind(wnd.Gfx(), cam.GetMatrix());
-	
-	// render geometry
-	for (auto& d : drawables)
-	{
-		d->Update(wnd.kbd.KeyIsPressed(VK_SPACE) ? 0.0f : dt);
-		d->Draw(wnd.Gfx());
-	}
+
+	nano.Draw(wnd.Gfx());
+	//nano2.Draw(wnd.Gfx());
 	light.Draw(wnd.Gfx());
+	plane.Draw(wnd.Gfx());
+	cube.Draw(wnd.Gfx());
 	
+	while (const auto e = wnd.kbd.ReadKey())
+	{
+		if (!e->IsPress())
+		{
+			continue;
+		}
+
+		switch (e->GetCode())
+		{
+		case VK_ESCAPE:
+			if (wnd.CursorEnabled())
+			{
+				wnd.DisableCursor();
+				wnd.mouse.EnableRaw();
+			}
+			else
+			{
+				wnd.EnableCursor();
+				wnd.mouse.DisableRaw();
+			}
+			break;
+		case VK_F1:
+			showDemoWindow = true;
+			break;
+		}
+	}
+
+	if (!wnd.CursorEnabled())
+	{
+		if (wnd.kbd.KeyIsPressed('W'))
+		{
+			cam.Translate({ 0.0f,0.0f,dt });
+		}
+		if (wnd.kbd.KeyIsPressed('A'))
+		{
+			cam.Translate({ -dt,0.0f,0.0f });
+		}
+		if (wnd.kbd.KeyIsPressed('S'))
+		{
+			cam.Translate({ 0.0f,0.0f,-dt });
+		}
+		if (wnd.kbd.KeyIsPressed('D'))
+		{
+			cam.Translate({ dt,0.0f,0.0f });
+		}
+		if (wnd.kbd.KeyIsPressed('R'))
+		{
+			cam.Translate({ 0.0f,dt,0.0f });
+		}
+		if (wnd.kbd.KeyIsPressed('F'))
+		{
+			cam.Translate({ 0.0f,-dt,0.0f });
+		}
+	}
+
+	while (const auto delta = wnd.mouse.ReadRawDelta())
+	{
+		if (!wnd.CursorEnabled())
+		{ 
+			cam.Rotate((float)delta->x, (float)delta->y);
+		}
+	}
+
 	// imgui windows
-	SpawnSimulationWindow();
 	cam.SpawnControlWindow();
 	light.SpawnControlWindow();
-	SpawnBoxWindowManagerWindow();
-	SpawnBoxWindows();
+	ShowImguiDemoWindow();
+	nano.ShowWindow("Model 1");
+	//nano2.ShowWindow("Model 2");
+	plane.SpawnControlWindow(wnd.Gfx());
+	cube.SpwanControlWindow(wnd.Gfx());
 
 	// present
 	// 실제로 화면에 표현
 	wnd.Gfx().EndFrame();
 }
 
-void App::SpawnSimulationWindow() noexcept
+void App::ShowImguiDemoWindow()
 {
-	// imgui window to control simulation speed
-	if (ImGui::Begin("Simulation Speed"))
+	if (showDemoWindow)
 	{
-		ImGui::SliderFloat("Speed Factor", &speed_factor, 0.0f, 6.0f, "%.4f", ImGuiSliderFlags_::ImGuiSliderFlags_Logarithmic);
-		ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::Text("Status: %s", wnd.kbd.KeyIsPressed(VK_SPACE) ? "PAUSED" : "RUNNING (hold spacebar to pause");
-	}
-	ImGui::End();
-}
-
-void App::SpawnBoxWindowManagerWindow() noexcept
-{
-	// imgui window to open box windows
-	if (ImGui::Begin("Boxes"))
-	{
-		using namespace std::string_literals;
-		const auto preview = comboBoxIndex ? std::to_string(*comboBoxIndex) : "Choose a box..."s;
-		if (ImGui::BeginCombo("Box Number", preview.c_str()))
-		{
-			for (int i = 0; i < boxes.size(); i++)
-			{
-				const bool selected = *comboBoxIndex = i;
-				if (ImGui::Selectable(std::to_string(i).c_str(), selected))
-				{
-					comboBoxIndex = i;
-				}
-				if (selected)
-				{
-					ImGui::SetItemDefaultFocus();
-				}
-			}
-			ImGui::EndCombo();
-		}
-		if (ImGui::Button("Spawn Control Window") && comboBoxIndex)
-		{
-			boxControlIds.insert(*comboBoxIndex);
-			comboBoxIndex.reset();
-		}
-	}
-	ImGui::End();
-}
-
-void App::SpawnBoxWindows() noexcept
-{
-	for (auto i = boxControlIds.begin(); i != boxControlIds.end();)
-	{
-		if (!boxes[*i]->SpawnControlWindow(*i, wnd.Gfx()))
-		{
-			i = boxControlIds.erase(i);
-		}
-		else
-		{
-			i++;
-		}
+		ImGui::ShowDemoWindow(&showDemoWindow);
 	}
 }
 
 App::~App()
 {}
-
 
 int App::Go()
 {

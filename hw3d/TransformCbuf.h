@@ -3,21 +3,24 @@
 #include "Drawable.h"
 #include <DirectXMath.h>
 
-// 변환 상수 버퍼
-class TransformCbuf : public Bindable
+namespace Bind
 {
-private:
-	struct Transforms
+	class TransformCbuf : public Bindable
 	{
-		// homogeneous clip space(동차절단공간) 또는 projection space(투영공간) 변환 행렬
-		DirectX::XMMATRIX modelViewProj;
-		// local space
-		DirectX::XMMATRIX model;
+	protected:
+		struct Transforms
+		{
+			DirectX::XMMATRIX modelView;
+			DirectX::XMMATRIX modelViewProj;
+		};
+	public:
+		TransformCbuf(Graphics& gfx, const Drawable& parent, UINT slot = 0u);
+		void Bind(Graphics& gfx) noexcept override;
+	protected:
+		void UpdateBindImpl(Graphics& gfx, const Transforms& tf) noexcept;
+		Transforms GetTransforms(Graphics& gfx) noexcept;
+	private:
+		static std::unique_ptr<VertexConstantBuffer<Transforms>> pVcbuf;
+		const Drawable& parent;
 	};
-public:
-	TransformCbuf(Graphics& gfx, const Drawable& parent, UINT slot = 0u);
-	void Bind(Graphics& gfx) noexcept override;
-private:
-	static std::unique_ptr<VertexConstantBuffer<Transforms>> pVcbuf;
-	const Drawable& parent;
-};
+}
